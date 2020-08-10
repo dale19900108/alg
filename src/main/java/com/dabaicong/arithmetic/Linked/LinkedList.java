@@ -29,13 +29,16 @@ public class LinkedList<T> {
         list.print();
         list.remove(4);
         list.print();
-        list.reverser3();
+//        list.reverser3();
+//        list.print();
+//        list.reverser2();
+//        list.print();
+        list.head = list.reverser1(list.head);
         list.print();
-        list.reverser2();
-        list.print();
-        list.reverser1(list.head);
 
     }
+
+
 
     /**
      * 链表反转1
