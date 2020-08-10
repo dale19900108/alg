@@ -11,9 +11,7 @@ public class LinkedList<T> {
     public Node<T> head;
 
     public LinkedList() {
-        Node<T> head = new Node<T>();
-        head.next = null;
-        this.head = head;
+        this.head = null;
     }
 
     public static void main(String[] args) {
@@ -21,6 +19,11 @@ public class LinkedList<T> {
         list.add(1);
         list.add(2);
         list.add(3);
+        list.add(4);
+        list.add(5);
+        list.print();
+        list.remove(4);
+        System.out.println();
         list.print();
 
     }
@@ -55,11 +58,14 @@ public class LinkedList<T> {
     public void add(T entry) {
         Node<T> node = new Node<>(entry);
         Node<T> pre = head;
-        while (pre.getNext() != null) {
+        if (pre == null){
+            head = node ;
+            return;
+        }
+        while ( pre.getNext() != null) {
             pre = pre.getNext();
         }
-        pre.next = node;
-        node.next = null;
+        pre.next = node ;
     }
 
     /**
@@ -69,14 +75,13 @@ public class LinkedList<T> {
         // before 指针用来保存pre之前的一个节点 。
         Node<T> pre = head;
         Node<T> current = head;
-        while (current.getNext() != null) {
-
+        while (head!=null &&current.getNext() != null) {
             // 找到了元素
             if (current.getData().equals(entry)) {
                 pre.next = current.next;
                 break;
             }
-            pre = head;
+            pre = current;
             current = current.getNext();
         }
     }
@@ -86,10 +91,13 @@ public class LinkedList<T> {
      */
     public void print() {
         System.out.print("Head-->");
-        while (head.next != null) {
-            System.out.println((head.getData()) + "-->");
+        Node<T> current = head ;
+        while (current.next != null) {
+            System.out.print((current.getData()) + "-->");
+            current = current.getNext();
+
         }
-        System.out.print("End");
+        System.out.print(current.getData()+"-->End");
     }
 }
 
