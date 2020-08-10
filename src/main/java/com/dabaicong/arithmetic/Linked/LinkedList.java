@@ -1,6 +1,11 @@
 package com.dabaicong.arithmetic.Linked;
 
 import lombok.Data;
+import org.w3c.dom.stylesheets.LinkStyle;
+import sun.jvm.hotspot.opto.CallNode;
+
+import java.time.Period;
+import java.util.Stack;
 
 /**
  * 一个普通的链表。
@@ -23,8 +28,12 @@ public class LinkedList<T> {
         list.add(5);
         list.print();
         list.remove(4);
-        System.out.println();
         list.print();
+        list.reverser3();
+        list.print();
+        list.reverser2();
+        list.print();
+        list.reverser1(list.head);
 
     }
 
@@ -32,8 +41,16 @@ public class LinkedList<T> {
      * 链表反转1
      * 通过递归反转
      */
-    public void reverser1() {
+    public Node<T> reverser1(Node<T> head) {
+        if (head == null || head.next==null){
+            return head ;
+        }
+        Node<T> newList = reverser1(head.next);
 
+        Node<T> temp = head.next;
+        temp.next = head ;
+        head.next = null ;
+        return newList ;
     }
 
     /**
@@ -41,7 +58,20 @@ public class LinkedList<T> {
      * 通过双指针反转
      */
     public void reverser2() {
-
+        Node<T> pre = null ;
+        Node<T> current = head;
+        do {
+            // 先保存下current的next地址
+            Node<T> temp = current.next;
+            // 当前的next调转指向之前
+            current.next = pre;
+            // pre前进一步
+            pre = current;
+            // current复制 。
+            current = temp;
+        }while (current.next!= null );
+        current.next = pre;
+       head = current;
     }
 
     /**
@@ -49,6 +79,19 @@ public class LinkedList<T> {
      * 通过栈反转。
      */
     public void reverser3() {
+        Stack<Node<T>> stack = new Stack<>();
+        Node<T> current = head ;
+        while (current.getNext()!=null){
+            stack.push(current);
+            current = current.next;
+        }
+        head = current ;
+        do{
+            Node<T> node = stack.pop();
+            current.next = node ;
+            current=node ;
+        }while (stack.size()!=0 );
+        current.next = null ;
 
     }
 
@@ -97,7 +140,7 @@ public class LinkedList<T> {
             current = current.getNext();
 
         }
-        System.out.print(current.getData()+"-->End");
+        System.out.print(current.getData()+"-->End\n");
     }
 }
 
