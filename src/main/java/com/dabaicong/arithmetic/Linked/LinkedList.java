@@ -1,10 +1,6 @@
 package com.dabaicong.arithmetic.Linked;
 
 import lombok.Data;
-import org.w3c.dom.stylesheets.LinkStyle;
-import sun.jvm.hotspot.opto.CallNode;
-
-import java.time.Period;
 import java.util.Stack;
 
 /**
@@ -43,13 +39,23 @@ public class LinkedList<T> {
     /**
      * 链表反转1
      * 通过递归反转
+     * 通过这个理解了下递归，
+     * 递归的两个关键点
+     * 1.找到边界条件 。
+     * 2.找到循环的最小条件 。
+     *
+     * 这里还有一点，可以这么理解递归。
+     * 递归是边界条件的元素，和边界之前元素的调整 。
+     *
      */
     public Node<T> reverser1(Node<T> head) {
+        // 递归的边界条件。=null是链表可能是空的。 .next = null才是正常的条件。
         if (head == null || head.next==null){
             return head ;
         }
+        // 触发递归 。
         Node<T> newList = reverser1(head.next);
-
+        // 递归的解决
         Node<T> temp = head.next;
         temp.next = head ;
         head.next = null ;
