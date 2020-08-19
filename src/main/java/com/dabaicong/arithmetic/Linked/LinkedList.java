@@ -5,6 +5,7 @@ import java.util.Stack;
 
 /**
  * 一个普通的链表。
+ * 此版本存在一个问题，那就是多线程不安全 。
  */
 public class LinkedList<T> {
 
@@ -103,6 +104,10 @@ public class LinkedList<T> {
         current.next = null ;
 
     }
+    // 反转k个
+    public void reverserKgroup(Node<T> head,int k ){
+
+    }
 
     /**
      * 向链表中添加元素
@@ -152,6 +157,7 @@ public class LinkedList<T> {
         System.out.print(current.getData()+"-->End\n");
     }
 }
+
 
 @Data
 class Node<T> {
