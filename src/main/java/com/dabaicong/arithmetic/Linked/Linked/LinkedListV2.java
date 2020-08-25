@@ -4,17 +4,21 @@ import lombok.Data;
 import org.apache.lucene.util.RamUsageEstimator;
 
 import java.lang.ref.SoftReference;
+import java.lang.ref.WeakReference;
 import java.util.Stack;
 
 /**
  * 一个普通的链表的优化，
  * 这次是针对node的优化，不采用node 而是采用他的软引用
  * 软引用，不一定是空间优化，因为软引用也是占空间的。
- * 如果软引用的大小，超过了T类型长度。那么，是值得的。基本类型，反倒会影响
+ * 如果软引用的大小，影响超过了T类型长度。那么，是值得的。基本类型，反倒会
  *
- * RamUsageEstimator在4.0.0版本时候，可以计算链表，但是有安全问题。
- * 升级到最新版本，却不能计算链表了
+ * 放弃吧。 SoftReference  也会导致内存回收 。
+ * 回收条件比较严格，需要在内存占满的时候，才回收 。
+ * 触发回收可以指定堆内存大小，然后通过分配大连续数组触发
+ * -Xms64m -Xmx64m
  */
+@Deprecated
 public class LinkedListV2<T> {
 
     // 链表的头指针
@@ -24,42 +28,43 @@ public class LinkedListV2<T> {
         this.head = null;
     }
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws InterruptedException {
         LinkedListV2<Integer> list = new LinkedListV2<>();
-        list.add(1);
-        System.out.println("LinkedList object size :"+ RamUsageEstimator.shallowSizeOf(list));
-        list.add(2);
-        System.out.println("LinkedList object size :"+ RamUsageEstimator.shallowSizeOf(list));
-        list.add(3);
-        System.out.println("LinkedList object size :"+ RamUsageEstimator.shallowSizeOf(list));
-        list.add(4);
-        System.out.println("LinkedList object size :"+ RamUsageEstimator.shallowSizeOf(list));
-        list.add(5);
-        System.out.println("LinkedList object size :"+ RamUsageEstimator.shallowSizeOf(list));
-        list.print();
-        list.remove(4);
-        System.out.println("LinkedList object size :"+ RamUsageEstimator.shallowSizeOf(list));
-        list.print();
-        list.reverser3();
-//        list.print();
-//        list.reverser2();
-//        list.print();
-//        list.head = list.reverser1(list.head);
-        System.out.println("LinkedList object size :"+ RamUsageEstimator.shallowSizeOf(list));
-        list.print();
+        for (int i = 0; i < 20000; i++) {
+            list.add(i+1);
+        }
 
-        /*
-LinkedList object size :56
-LinkedList object size :184
-LinkedList object size :264
-LinkedList object size :344
-LinkedList object size :424
-Head-->1-->2-->3-->4-->5-->End
-LinkedList object size :344
-Head-->1-->2-->3-->5-->End
-LinkedList object size :344
-Head-->5-->3-->2-->1-->End
-         */
+        Thread.sleep(1000L);
+
+        System.gc();
+        System.gc();
+        System.gc();
+        Thread.sleep(1000L);
+        //分配大数据
+        byte[] bytes = new byte[1024 * 1024 * 64];
+        byte[] byte1 = new byte[1024 * 1024 * 64];
+        byte[] byte2 = new byte[1024 * 1024 * 64];
+        byte[] byte3 = new byte[1024 * 1024 * 64];
+        byte[] byte4 = new byte[1024 * 1024 * 64];
+        for (int i=0;i<byte1.length;i++) {
+            bytes[i] = 1;
+            byte1[i] = 2;
+            byte2[i] = 3;
+            byte3[i] = 4;
+            byte4[i] = 5;
+        }
+        System.gc();
+        System.gc();
+        System.gc();
+        Thread.sleep(1000L);
+
+
+        System.gc();
+        System.gc();
+        System.gc();
+
+        list.reverser3();
+        list.print();
 
     }
 
@@ -127,6 +132,7 @@ Head-->5-->3-->2-->1-->End
         do{
             Node<T> node = stack.pop();
             current.next = new SoftReference<>(node) ;
+//            current.next = new WeakReference<>(node) ;
             current=node ;
         }while (stack.size()!=0 );
         current.next = null ;
@@ -148,6 +154,7 @@ Head-->5-->3-->2-->1-->End
             pre = pre.getNext().get();
         }
         pre.next = new SoftReference<>(node) ;
+//        pre.next = new WeakReference<>(node) ;
     }
 
     /**
@@ -187,11 +194,18 @@ Head-->5-->3-->2-->1-->End
 @Data
 class Node<T> {
     T data;
+//    WeakReference<Node<T>> next;
     SoftReference<Node<T>> next;
 
     public Node(T entry) {
         this.data = entry;
         this.next = null;
     }
+    @Override
+    public void finalize(){
+        //gc回收teacher类的对象tea时调用的方法
+        System.out.println(data+"被回收");
+    }
+
 }
 
