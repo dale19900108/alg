@@ -21,25 +21,25 @@ public class LinkedList<T> {
     public static void main(String[] args) {
         LinkedList<Integer> list = new LinkedList<>();
         list.add(1);
-        System.out.println("LinkedList object size :"+ RamUsageEstimator.sizeOf(list));
+        System.out.println("LinkedList object size :"+ RamUsageEstimator.sizeOfObject(list));
         list.add(2);
-        System.out.println("LinkedList object size :"+ RamUsageEstimator.sizeOf(list));
+        System.out.println("LinkedList object size :"+ RamUsageEstimator.sizeOfObject(list));
         list.add(3);
-        System.out.println("LinkedList object size :"+ RamUsageEstimator.sizeOf(list));
+        System.out.println("LinkedList object size :"+ RamUsageEstimator.sizeOfObject(list));
         list.add(4);
-        System.out.println("LinkedList object size :"+ RamUsageEstimator.sizeOf(list));
+        System.out.println("LinkedList object size :"+ RamUsageEstimator.sizeOfObject(list));
         list.add(5);
-        System.out.println("LinkedList object size :"+ RamUsageEstimator.sizeOf(list));
+        System.out.println("LinkedList object size :"+ RamUsageEstimator.sizeOfObject(list));
         list.print();
         list.remove(4);
-        System.out.println("LinkedList object size :"+ RamUsageEstimator.sizeOf(list));
+        System.out.println("LinkedList object size :"+ RamUsageEstimator.sizeOfObject(list));
         list.print();
 //        list.reverser3();
 //        list.print();
 //        list.reverser2();
 //        list.print();
         list.head = list.reverser1(list.head);
-        System.out.println("LinkedList object size :"+ RamUsageEstimator.sizeOf(list));
+        System.out.println("LinkedList object size :"+ RamUsageEstimator.sizeOfObject(list));
         list.print();
 
     }

@@ -11,6 +11,9 @@ import java.util.Stack;
  * 这次是针对node的优化，不采用node 而是采用他的软引用
  * 软引用，不一定是空间优化，因为软引用也是占空间的。
  * 如果软引用的大小，超过了T类型长度。那么，是值得的。基本类型，反倒会影响
+ *
+ * RamUsageEstimator在4.0.0版本时候，可以计算链表，但是有安全问题。
+ * 升级到最新版本，却不能计算链表了
  */
 public class LinkedListV2<T> {
 
@@ -24,25 +27,25 @@ public class LinkedListV2<T> {
     public static void main(String[] args) {
         LinkedListV2<Integer> list = new LinkedListV2<>();
         list.add(1);
-        System.out.println("LinkedList object size :"+ RamUsageEstimator.sizeOf(list));
+        System.out.println("LinkedList object size :"+ RamUsageEstimator.shallowSizeOf(list));
         list.add(2);
-        System.out.println("LinkedList object size :"+ RamUsageEstimator.sizeOf(list));
+        System.out.println("LinkedList object size :"+ RamUsageEstimator.shallowSizeOf(list));
         list.add(3);
-        System.out.println("LinkedList object size :"+ RamUsageEstimator.sizeOf(list));
+        System.out.println("LinkedList object size :"+ RamUsageEstimator.shallowSizeOf(list));
         list.add(4);
-        System.out.println("LinkedList object size :"+ RamUsageEstimator.sizeOf(list));
+        System.out.println("LinkedList object size :"+ RamUsageEstimator.shallowSizeOf(list));
         list.add(5);
-        System.out.println("LinkedList object size :"+ RamUsageEstimator.sizeOf(list));
+        System.out.println("LinkedList object size :"+ RamUsageEstimator.shallowSizeOf(list));
         list.print();
         list.remove(4);
-        System.out.println("LinkedList object size :"+ RamUsageEstimator.sizeOf(list));
+        System.out.println("LinkedList object size :"+ RamUsageEstimator.shallowSizeOf(list));
         list.print();
         list.reverser3();
 //        list.print();
 //        list.reverser2();
 //        list.print();
 //        list.head = list.reverser1(list.head);
-        System.out.println("LinkedList object size :"+ RamUsageEstimator.sizeOf(list));
+        System.out.println("LinkedList object size :"+ RamUsageEstimator.shallowSizeOf(list));
         list.print();
 
         /*
