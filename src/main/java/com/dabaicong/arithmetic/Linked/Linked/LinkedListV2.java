@@ -203,7 +203,7 @@ class Node<T> {
     }
     @Override
     public void finalize(){
-        //gc回收teacher类的对象tea时调用的方法
+        //gc回收
         System.out.println(data+"被回收");
     }
 

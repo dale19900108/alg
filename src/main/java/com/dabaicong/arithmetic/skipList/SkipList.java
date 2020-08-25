@@ -1,6 +1,11 @@
 package com.dabaicong.arithmetic.skipList;
 
 
+import lombok.Data;
+
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * 跳表的实现。
  * <p>
@@ -10,16 +15,16 @@ package com.dabaicong.arithmetic.skipList;
 public class SkipList {
 
     // 跳表的头部
-    private final static Integer MAX_LEVEL = 64;
+    private static final Integer MAX_LEVEL = 8;
     // 链表的填充率,即，上层和下层的期望比例。
-    private final static double FILL_RATE = 0.5;
+    private static final double FILL_RATE = 0.5;
+    // 跳表的各层头部节点。
+    private SkipNode[] level = new SkipNode[MAX_LEVEL];
     // 跳表的头节点
-    private static Node head;
+    private SkipNode head;
     // 跳表中的最大数和最小数
     private Integer maxDate = null;
     private Integer minDate = null;
-    // 跳表的各层头部节点。
-    private Node[] level = new Node[MAX_LEVEL];
 
     /**
      * 初始化跳表，把最左面的数组初始化了。
@@ -27,19 +32,36 @@ public class SkipList {
      */
     public SkipList() {
         //
-        Node preNode = null;
+        SkipNode preSkipNode = null;
         for (int i = MAX_LEVEL - 1; i >= 0; i--) {
-            Node node = new Node(null, null, null);
-            if (preNode != null) {
-                node.setDown(preNode);
+            SkipNode skipNode = new SkipNode(null, null, null);
+            if (preSkipNode != null) {
+                skipNode.setDown(preSkipNode);
             }
-            preNode = node;
+            level[i] = skipNode;
+            preSkipNode = skipNode;
         }
-        // 跳表的头结点
         head = level[0];
     }
 
-    public boolean search(int target) {
+    public boolean search(Integer value) {
+        SkipNode temp = head;
+        // 一直探索到最底层
+        while (temp.getDown() != null) {
+            if (temp.getData().intValue() == value.intValue()) {
+                return true;
+            }
+            // 先向右试探是否可以通过。右侧是空，直接向下
+            if (temp.getRight() == null || (temp.getRight() != null && temp.getRight().getData() > value)) {
+                // temp向下移动
+                temp = temp.getDown();
+            }
+            // 右侧不为空，并且小于要插入的值，则向右移动
+            if (temp.getRight() != null && temp.getRight().getData() < value) {
+                temp = temp.getRight();
+            }
+
+        }
         return false;
     }
 
@@ -51,13 +73,57 @@ public class SkipList {
      * <p>
      * 最坏的情况，每次都输入数比之前小，则，直接更新链表头节点，
      *
-     * @param num
+     * @param value 插入的数据
      */
-    public void add(int num) {
+    public void add(Integer value) {
+
+        // 生成本次插入的随机层
+        int randomLevel = randomLevel();
+        System.out.println(value + "的层数是" + randomLevel);
+        List<SkipNode> visit = new ArrayList<>();
+        // 向下遍历到对应待插入层，把遍历的节点都保存到数组中
+        SkipNode temp = head;
+        // 一直探索到最底层
+        while (temp.getDown() != null ) {
+            // 先向右试探是否可以通过。右侧是空,或者是右侧节点大于值，直接向下
+            if (temp.getRight() == null || (temp.getRight() != null && temp.getRight().getData() > value)) {
+                // 保存遍历的节点
+                visit.add(temp);
+                // temp向下移动
+                temp = temp.getDown();
+            }
+            // 右侧不为空，并且小于要插入的值，则向右移动
+            while (temp.getRight() != null && temp.getRight().getData() < value) {
+                temp = temp.getRight();
+            }
+        }
+
+////        // 从最底层开始向右搜索直到找到要插入的位置。
+//        while (temp.getRight() == null || (temp.getRight() != null &&temp.getRight().getData()>value)) {
+//            temp = temp.getRight();
+//        }
+        // 最后把temp加入到遍历过的节点
+        visit.add(temp);
+
+        // 从randomLevel层开始遍历list。把list的右指针指向node，把node的右指针指向
+        SkipNode pre = null ;
+        for (int i = MAX_LEVEL-1; i >=randomLevel; i--) {
+            SkipNode node = visit.get(i);
+            SkipNode right = visit.get(i).getRight();
+            SkipNode entry = new SkipNode(right, pre, value);
+            node.setRight(entry);
+            pre = entry;
+        }
 
     }
 
-    public boolean erase(int num) {
+    /**
+     * 删除某个元素
+     *
+     * @param entry 元素
+     * @return
+     */
+    public boolean erase(Integer entry) {
         return false;
     }
 
@@ -76,41 +142,29 @@ public class SkipList {
 
         return level;
     }
+
+    public void print() {
+        for (int i = 0; i < level.length; i++) {
+            SkipNode node = level[i];
+            System.out.print("=level:" + i + "=");
+            while (node.getRight() != null) {
+                System.out.print(node.getData() + "--->");
+                node = node.getRight();
+            }
+            System.out.print(node.getData()+"--->Null\n");
+        }
+    }
 }
+@Data
+class SkipNode {
 
-class Node {
-
-    private Node right;
-    private Node down;
+    private SkipNode right;
+    private SkipNode down;
     private Integer data;
 
-    public Node(Node right, Node down, Integer data) {
+    public SkipNode(SkipNode right, SkipNode down, Integer data) {
         this.right = right;
         this.down = down;
-        this.data = data;
-    }
-
-    public Node getRight() {
-        return right;
-    }
-
-    public void setRight(Node right) {
-        this.right = right;
-    }
-
-    public Node getDown() {
-        return down;
-    }
-
-    public void setDown(Node down) {
-        this.down = down;
-    }
-
-    public Integer getData() {
-        return data;
-    }
-
-    public void setData(Integer data) {
         this.data = data;
     }
 }
