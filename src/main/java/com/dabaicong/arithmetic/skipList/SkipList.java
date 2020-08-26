@@ -11,6 +11,8 @@ import java.util.List;
  * <p>
  * 生成一个上层和下层比例是0.5的64层链表。
  * 理论上可以为2^64个数提供二分查找。
+ *
+ *  插入的时候，需要注意一个问题，那就是重复。如果发现重复的元素了怎么办 ？
  */
 public class SkipList {
 
@@ -21,7 +23,7 @@ public class SkipList {
     // 跳表的各层头部节点。
     private SkipNode[] level = new SkipNode[MAX_LEVEL];
     // 跳表的头节点
-    private SkipNode head;
+    public SkipNode head;
     // 跳表中的最大数和最小数
     private Integer maxDate = null;
     private Integer minDate = null;
@@ -31,7 +33,7 @@ public class SkipList {
      * 让上层指向下一层
      */
     public SkipList() {
-        //
+        // 初始化跳表
         SkipNode preSkipNode = null;
         for (int i = MAX_LEVEL - 1; i >= 0; i--) {
             SkipNode skipNode = new SkipNode(null, null, null);
@@ -45,22 +47,28 @@ public class SkipList {
     }
 
     public boolean search(Integer value) {
+        if (value == null){
+            return false ;
+        }
+        if(value<minDate || value>maxDate){
+            return  false ;
+        }
         SkipNode temp = head;
         // 一直探索到最底层
-        while (temp.getDown() != null) {
-            if (temp.getData().intValue() == value.intValue()) {
+        while (temp.getDown() != null ) {
+            // 如果是重复的元素，直接结束插入
+            if (temp.getRight()!= null && temp.getRight().getData()!=null && temp.getRight().getData().intValue()==value.intValue()){
                 return true;
             }
-            // 先向右试探是否可以通过。右侧是空，直接向下
+            // 先向右试探是否可以通过。右侧是空,或者是右侧节点大于值，直接向下
             if (temp.getRight() == null || (temp.getRight() != null && temp.getRight().getData() > value)) {
                 // temp向下移动
                 temp = temp.getDown();
             }
             // 右侧不为空，并且小于要插入的值，则向右移动
-            if (temp.getRight() != null && temp.getRight().getData() < value) {
+            while (temp.getRight() != null && temp.getRight().getData() < value) {
                 temp = temp.getRight();
             }
-
         }
         return false;
     }
@@ -85,6 +93,10 @@ public class SkipList {
         SkipNode temp = head;
         // 一直探索到最底层
         while (temp.getDown() != null ) {
+            // 如果是重复的元素，直接结束插入
+            if (temp.getRight()!= null && temp.getRight().getData()!=null && temp.getRight().getData().intValue()==value.intValue()){
+                return;
+            }
             // 先向右试探是否可以通过。右侧是空,或者是右侧节点大于值，直接向下
             if (temp.getRight() == null || (temp.getRight() != null && temp.getRight().getData() > value)) {
                 // 保存遍历的节点
@@ -97,13 +109,10 @@ public class SkipList {
                 temp = temp.getRight();
             }
         }
-
-////        // 从最底层开始向右搜索直到找到要插入的位置。
-//        while (temp.getRight() == null || (temp.getRight() != null &&temp.getRight().getData()>value)) {
-//            temp = temp.getRight();
-//        }
         // 最后把temp加入到遍历过的节点
         visit.add(temp);
+
+
 
         // 从randomLevel层开始遍历list。把list的右指针指向node，把node的右指针指向
         SkipNode pre = null ;
@@ -113,6 +122,14 @@ public class SkipList {
             SkipNode entry = new SkipNode(right, pre, value);
             node.setRight(entry);
             pre = entry;
+        }
+
+        // 更新最大最小值
+        if (maxDate==null || maxDate<value){
+            maxDate = value ;
+        }
+        if (minDate==null || minDate>value){
+            minDate = value ;
         }
 
     }
