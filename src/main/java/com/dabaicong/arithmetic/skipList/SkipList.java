@@ -36,7 +36,7 @@ public class SkipList {
         // 初始化跳表
         SkipNode preSkipNode = null;
         for (int i = MAX_LEVEL - 1; i >= 0; i--) {
-            SkipNode skipNode = new SkipNode(null, null, null);
+            SkipNode skipNode = new SkipNode(null, null, Integer.MIN_VALUE);
             if (preSkipNode != null) {
                 skipNode.setDown(preSkipNode);
             }
@@ -87,15 +87,24 @@ public class SkipList {
 
         // 生成本次插入的随机层
         int randomLevel = randomLevel();
-        System.out.println(value + "的层数是" + randomLevel);
+        System.out.println("value ："+value+"层数是"+randomLevel);
         List<SkipNode> visit = new ArrayList<>();
         // 向下遍历到对应待插入层，把遍历的节点都保存到数组中
         SkipNode temp = head;
+        int downLevel = 0 ;
+        boolean flag = false ;
         // 一直探索到最底层
         while (temp.getDown() != null ) {
+
             // 如果是重复的元素，直接结束插入
-            if (temp.getRight()!= null && temp.getRight().getData()!=null && temp.getRight().getData().intValue()==value.intValue()){
-                return;
+            if (temp.getRight()!= null && temp.getRight().getData()!=null && temp.getRight().getData().intValue()==value){
+                System.out.println("downLevel:"+downLevel);
+                randomLevel =downLevel;
+                flag = true;
+                // 保存遍历的节点
+                visit.add(temp);
+                // temp向下移动
+                temp = temp.getDown();
             }
             // 先向右试探是否可以通过。右侧是空,或者是右侧节点大于值，直接向下
             if (temp.getRight() == null || (temp.getRight() != null && temp.getRight().getData() > value)) {
@@ -103,11 +112,15 @@ public class SkipList {
                 visit.add(temp);
                 // temp向下移动
                 temp = temp.getDown();
+                if (!flag) {
+                    downLevel++;
+                }
             }
             // 右侧不为空，并且小于要插入的值，则向右移动
             while (temp.getRight() != null && temp.getRight().getData() < value) {
                 temp = temp.getRight();
             }
+
         }
         // 最后把temp加入到遍历过的节点
         visit.add(temp);
@@ -137,11 +150,38 @@ public class SkipList {
     /**
      * 删除某个元素
      *
-     * @param entry 元素
+     * @param value 对象
      * @return
      */
-    public boolean erase(Integer entry) {
+    public boolean erase(Integer value) {
+        if(value<minDate || value>maxDate){
+            return  false ;
+        }
+        // 记录下路过的点。key是路过的，value是确定的值
+        List<SkipNode> visit = new ArrayList<>();
+        SkipNode temp = head;
+        // 一直探索到最底层
+        while (temp!=null &&( temp.getDown() != null || temp.getData()<value)) {
+
+
+            // 右侧不为空，并且小于要插入的值，则向右移动
+            while (temp.getRight() != null && temp.getRight().getData() < value) {
+                temp = temp.getRight();
+            }
+            // 先向右试探是否可以通过。右侧是空,或者是右侧节点大于值，直接向下
+            if (temp.getRight() == null || (temp.getRight() != null && temp.getRight().getData() > value)) {
+                // temp向下移动
+                temp = temp.getDown();
+            }
+            // 如果是重复的元素，则说明是找到了对应元素，把这个点的right执行right的right
+            if (temp.getRight()!= null && temp.getRight().getData()!=null && temp.getRight().getData().intValue()==value.intValue()){
+                System.out.println(temp.getData());
+                temp.setRight(temp.getRight().getRight());
+                temp  = temp.getDown();
+            }
+        }
         return false;
+
     }
 
     /**

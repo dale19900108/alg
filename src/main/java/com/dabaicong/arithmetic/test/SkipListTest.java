@@ -25,8 +25,9 @@ public class SkipListTest {
         list.print();
         System.out.println("22222222222222222222222");
         list.add(10);
-        list.add(10);
-        list.add(10);
+        list.print();
+        list.erase(12);
+        System.out.println("\n\n");
         list.print();
 
     }
